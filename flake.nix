@@ -21,20 +21,26 @@
                 inputs,
                 config,
                 lib,
-                self,
                 withSystem,
+                flake-parts-lib,
                 ...
-            }: {
+            }: let
+                projectLib = import ./lib.nix {inherit (inputs.nixpkgs) lib;};
+                inherit (flake-parts-lib) importApply;
+                kubernetesFlakeModule = importApply ./flake-module.nix {
+                    inherit projectLib withSystem;
+                };
+            in {
                 imports = [
                     inputs.devshell.flakeModule
                     inputs.flake-parts.flakeModules.modules # to use flake-parts module system; see https://flake.parts/options/flake-parts-modules.html
                     ./pkgs.nix
-                    # (inputs.import-tree
-                    #   .filterNot (
-                    #     path:
-                    #         lib.hasSuffix ".no-auto-import.nix" path
-                    # )
-                    # ./nix)
+                    (inputs.import-tree
+                      .filterNot (
+                        path:
+                            lib.hasSuffix ".no-auto-import.nix" path
+                    )
+                    ./test)
                 ];
 
                 flake.overlays = {
@@ -47,6 +53,8 @@
                     "aarch64-darwin"
                 ];
 
+                flake.flakeModule = config.flake.flakeModules.default;
+                flake.flakeModules.default = kubernetesFlakeModule;
 
                 perSystem = {pkgs, ...}: {
                     formatting.enable = true;
