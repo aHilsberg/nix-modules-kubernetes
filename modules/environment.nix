@@ -110,7 +110,7 @@
                             [config.outputConfig.directoryName]
                             # ++ lib.optional (hasEnabledLayout "by-scope") TODO
                             ++ lib.optional (hasEnabledLayout "by-namespace") value.metadata.namespace or "cluster-wide"
-                            ++ lib.optional (hasEnabledLayout "by-kind") value.metadata.kind
+                            ++ lib.optional (hasEnabledLayout "by-kind") value.kind
                             ++ [path]
                         ));
                     })

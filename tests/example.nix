@@ -7,11 +7,6 @@
     flake.modules.flake.nixResouceToYaml = {...}: {
         perSystem = {
             n19s.environments.testing = {
-                outputConfig = {
-                    directoryName = "tests/snapshots/nixResouceToYaml";
-                    nestingLayout = []; # flat
-                };
-
                 resourceSets.gateway = {...}: {
                     resources = [
                         {
@@ -27,6 +22,11 @@
                             };
                         }
                     ];
+                };
+                
+                outputConfig = {
+                    directoryName = "tests/snapshots/nixResouce_producesExpectedYaml";
+                    nestingLayout = []; # flat
                 };
             };
         };
@@ -50,7 +50,7 @@
                 }
             ).config.flake;
 
-        packages.generate-test-nixResouceToYaml =
+        packages.generate-test-nixResouce_producesExpectedYaml =
             (
                 flake-parts-lib.mkFlake
                 {inherit inputs;}
