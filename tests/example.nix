@@ -7,19 +7,26 @@
     flake.modules.flake.nixResouceToYaml = {...}: {
         perSystem = {
             n19s.environments.testing = {
+                outputConfig = {
+                    directoryName = "tests/snapshots/nixResouceToYaml";
+                    nestingLayout = []; # flat
+                };
+
                 resourceSets.gateway = {...}: {
-                    resources.gateways.edge = {
-                        apiVersion = "gateway.networking.k8s.io/v1";
-                        kind = "Gateway";
+                    resources = [
+                        {
+                            apiVersion = "gateway.networking.k8s.io/v1";
+                            kind = "Gateway";
 
-                        metadata.name = "edge";
+                            metadata.name = "edge";
 
-                        sections.listeners.https.value = {
-                            name = "https";
-                            port = 443;
-                            protocol = "HTTPS";
-                        };
-                    };
+                            sections.listeners.https.value = {
+                                name = "https";
+                                port = 443;
+                                protocol = "HTTPS";
+                            };
+                        }
+                    ];
                 };
             };
         };

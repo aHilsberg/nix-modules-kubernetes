@@ -2,14 +2,14 @@
     lib,
     projectLib,
     name,
+    config,
+    pkgs,
     ...
 }: {
     options = {
-        /*
-    Draft scopes / graph fragments.
-    */
+        # Draft scopes / graph fragments.
         resourceSets = lib.mkOption {
-            type = lib.types.attrsOf projectLib.resourceSetType;
+            type = lib.types.attrsOf (projectLib.types.resourceSet {inherit pkgs;});
             default = {};
             description = ''
                 Reusable resource draft scopes. Each resource set may be a plain module body
@@ -21,17 +21,17 @@
             '';
         };
 
-        /*
-    Final rendered scopes.
-    */
-        scopes = lib.mkOption {
-            type = lib.types.attrsOf projectLib.resourceSetType;
-            default = {};
-            description = ''
-                Rendered output scopes. These instantiate resource sets, bind refs,
-                apply final transforms, and produce YAML output.
-            '';
-        };
+        #     /*
+        # Final rendered scopes.
+        # */
+        #     scopes = lib.mkOption {
+        #         type = lib.types.attrsOf projectLib.types.resourceSet;
+        #         default = {};
+        #         description = ''
+        #             Rendered output scopes. These instantiate resource sets, bind refs,
+        #             apply final transforms, and produce YAML output.
+        #         '';
+        #     };
 
         outputConfig = {
             directoryName = lib.mkOption {
@@ -44,11 +44,11 @@
             };
 
             nestingLayout = lib.mkOption {
-                type = lib.types.listOf lib.types.enum [
+                type = lib.types.listOf (lib.types.enum [
                     "by-scope"
                     "by-namespace"
                     "by-kind"
-                ];
+                ]);
                 default = [];
 
                 description = ''
@@ -69,11 +69,14 @@
 
                     files = lib.mkOption {
                         type = lib.types.listOf (lib.types.submodule {
-                            freeformType = lib.types.attrsOf lib.types.anything;
-
-                            options.source = lib.mkOption {
-                                type = lib.types.str;
-                                description = "File path";
+                            options = {
+                                source = lib.mkOption {
+                                    type = lib.types.either lib.types.package lib.types.pathInStore;
+                                };
+                                path = lib.mkOption {
+                                    type = lib.types.str;
+                                    description = "File path";
+                                };
                             };
                         });
                     };
@@ -84,7 +87,35 @@
             readOnly = true;
         };
     };
-    config = {
-        # build.resources = {};
+    config.build = {
+        resources =
+            config.resourceSets
+            |> lib.mapAttrsToList (_: resourceSet: resourceSet.build.resources)
+            |> lib.concatLists;
+
+        files =
+            config.resourceSets
+            |> lib.mapAttrsToList (
+                _: resourceSet:
+                    builtins.map ({
+                        source,
+                        value,
+                        path,
+                    }: {
+                        inherit source;
+                        path = let
+                            nestingLayout = config.outputConfig.nestingLayout;
+                            hasEnabledLayout = layout: builtins.elem layout nestingLayout;
+                        in (lib.concatStringsSep "/" (
+                            [config.outputConfig.directoryName]
+                            # ++ lib.optional (hasEnabledLayout "by-scope") TODO
+                            ++ lib.optional (hasEnabledLayout "by-namespace") value.metadata.namespace or "cluster-wide"
+                            ++ lib.optional (hasEnabledLayout "by-kind") value.metadata.kind
+                            ++ [path]
+                        ));
+                    })
+                    resourceSet.build.files
+            )
+            |> lib.concatLists;
     };
 }

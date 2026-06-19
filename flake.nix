@@ -25,22 +25,24 @@
                 flake-parts-lib,
                 ...
             }: let
-                projectLib = import ./lib.nix {inherit (inputs.nixpkgs) lib;};
                 inherit (flake-parts-lib) importApply;
                 kubernetesFlakeModule = importApply ./flake-module.nix {
-                    inherit projectLib withSystem;
+                    inherit withSystem;
+                    projectLib = config.projectLib;
                 };
             in {
                 imports = [
                     inputs.devshell.flakeModule
                     inputs.flake-parts.flakeModules.modules # to use flake-parts module system; see https://flake.parts/options/flake-parts-modules.html
                     ./pkgs.nix
+                    ./lib.nix
+                    (inputs.import-tree .filter (path: lib.hasSuffix ".lib.nix" path) ./modules)
                     (inputs.import-tree
                       .filterNot (
                         path:
                             lib.hasSuffix ".no-auto-import.nix" path
                     )
-                    ./test)
+                    ./tests)
                 ];
 
                 flake.overlays = {
