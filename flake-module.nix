@@ -27,18 +27,18 @@
                 type = lib.types.submodule {
                     options = {
                         resourceTypeRegistry = lib.mkOption {
-                          type = lib.types.attrsOf (lib.types.attrsOf lib.types.optionType);
-                          description = ''
-                              A nested attribute set; a map with first key beeing apiVersion,
-                              second key kind, value beeing resource kind submodule type.
+                            type = lib.types.attrsOf (lib.types.attrsOf lib.types.optionType);
+                            description = ''
+                                A nested attribute set; a map with first key beeing apiVersion,
+                                second key kind, value beeing resource kind submodule type.
                             '';
-                           example = ''
-                               registry = {
-                               "v1".Service          = serviceSubmodule;
-                               "apps/v1".Deployment  = lib.types.submodule { ... };
-                               };
-                           '';
-                           default = {};
+                            example = ''
+                                registry = {
+                                "v1".Service          = serviceSubmodule;
+                                "apps/v1".Deployment  = lib.types.submodule { ... };
+                                };
+                            '';
+                            default = {};
                         };
                     };
                 };

@@ -1,12 +1,10 @@
-
-
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `types.nix` | `k8sObject` discriminated union type + submodule definitions |
-| `module.nix` | Minimal module: `options.resources = listOf k8sObject` |
-| `eval.nix` | No-flake evaluation entry point with test data |
+| File         | Purpose                                                      |
+| ------------ | ------------------------------------------------------------ |
+| `types.nix`  | `k8sObject` discriminated union type + submodule definitions |
+| `module.nix` | Minimal module: `options.resources = listOf k8sObject`       |
+| `eval.nix`   | No-flake evaluation entry point with test data               |
 
 ## Running
 
@@ -38,6 +36,7 @@ nix eval -f eval.nix --json --show-trace
 ```nix
 spec.ports = [{ port = "not-a-number"; }]
 ```
+
 ```
 error: A definition for option `resources...port' is not of type `signed integer'.
 ```
@@ -47,6 +46,7 @@ error: A definition for option `resources...port' is not of type `signed integer
 ```nix
 { apiVersion = "v1"; kind = "ConfigMap"; ... }
 ```
+
 ```
 error: A definition for option `resources...' is not of type
        `Kubernetes manifest discriminated by apiVersion and kind'.
@@ -58,6 +58,7 @@ error: A definition for option `resources...' is not of type
 { apiVersion = "v1"; kind = "Service"; spec.ports = [...]; }
 # metadata.name omitted
 ```
+
 ```
 error: The option `name' was accessed but has no value defined.
 ```

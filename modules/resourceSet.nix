@@ -8,7 +8,7 @@
 }: {
     options = {
         resources = lib.mkOption {
-            type = lib.types.listOf (projectLib.types.resource { registry = configuration.resourceTypeRegistry; });
+            type = lib.types.listOf (projectLib.types.resource {registry = configuration.resourceTypeRegistry;});
             default = {};
             description = "K8s resource manifests specified in nix";
             example = ''

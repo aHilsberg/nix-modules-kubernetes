@@ -23,7 +23,7 @@
                         }
                     ];
                 };
-                
+
                 outputConfig = {
                     directoryName = "tests/snapshots/nixResouce_producesExpectedYaml";
                     nestingLayout = []; # flat
