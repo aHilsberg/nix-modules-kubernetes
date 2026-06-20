@@ -1,15 +1,16 @@
 {
-    lib,
-    projectLib,
     name,
-    config,
+    lib,
     pkgs,
+    config,
+    projectLib,
+    configuration,
     ...
 }: {
     options = {
         # Draft scopes / graph fragments.
         resourceSets = lib.mkOption {
-            type = lib.types.attrsOf (projectLib.types.resourceSet {inherit pkgs;});
+            type = lib.types.attrsOf (projectLib.types.resourceSet {inherit pkgs configuration;});
             default = {};
             description = ''
                 Reusable resource draft scopes. Each resource set may be a plain module body

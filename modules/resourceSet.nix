@@ -2,12 +2,13 @@
     lib,
     config,
     pkgs,
+    projectLib,
+    configuration,
     ...
 }: {
     options = {
         resources = lib.mkOption {
-            # todo
-            type = lib.types.listOf lib.types.anything;
+            type = lib.types.listOf (projectLib.types.resource { registry = configuration.resourceTypeRegistry; });
             default = {};
             description = "K8s resource manifests specified in nix";
             example = ''
